@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1023153877916",
+    "firebase_url": "https://anonymous-chat-roulette.firebaseio.com",
+    "project_id": "anonymous-chat-roulette",
+    "storage_bucket": "anonymous-chat-roulette.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1023153877916:android:6b362cfb0763d3b6668e59",
+        "android_client_info": {
+          "package_name": "com.stdio.anonymouschatroulette"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1023153877916-1ihm5h96ur49nb4slf8mvtaev6vhrnad.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.stdio.anonymouschatroulette",
+            "certificate_hash": "910a106ae38b772620c42368bae695884169398c"
+          }
+        },
+        {
+          "client_id": "1023153877916-37g8jojvrbhljuo3cg37gavek35b74up.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCmZFXMpqBEwZ5ZlsC-Mi0w16pEVZfS7q0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1023153877916-37g8jojvrbhljuo3cg37gavek35b74up.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
