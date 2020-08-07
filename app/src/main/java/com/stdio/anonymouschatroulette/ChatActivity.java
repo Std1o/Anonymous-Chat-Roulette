@@ -182,8 +182,7 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
 
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.leftBtn:
-            case R.id.ivClose:
+            case R.id.ivBack:
                 finish();
                 break;
             case R.id.addMessageImageView:

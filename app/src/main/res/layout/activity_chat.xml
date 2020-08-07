@@ -15,28 +15,16 @@
         android:layout_height="?android:attr/actionBarSize"
         android:orientation="horizontal">
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/leftBtn"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+        <ImageView
+            android:id="@+id/ivBack"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="20dp"
-            app:cardCornerRadius="15dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:onClick="onClick"
-            app:cardElevation="5dp">
-
-            <ImageView
-                android:id="@+id/ivClose"
-                android:layout_width="10dp"
-                android:layout_height="15dp"
-                android:layout_gravity="center"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:onClick="onClick"
-                android:src="@drawable/icon_decline" />
-        </androidx.cardview.widget.CardView>
+            android:src="@drawable/ic_arrow" />
 
         <TextView
             android:id="@+id/textTitle"
@@ -45,8 +33,8 @@
             android:layout_marginLeft="20dp"
             android:layout_weight="1"
             android:gravity="center_vertical"
-            android:text="Чат"
-            android:textColor="@android:color/black"
+            android:text="Прекратить диалог"
+            android:textColor="#26D3CE"
             android:textSize="16sp" />
     </LinearLayout>
 
