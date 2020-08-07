@@ -107,7 +107,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                         } else {
                             Log.d(TAG, "i am working");
                             startActivity(new Intent(MainActivity.this, ChatActivity.class));
-                            finish();
                         }
                     }
                 });

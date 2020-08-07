@@ -27,13 +27,16 @@
             android:src="@drawable/ic_arrow" />
 
         <TextView
-            android:id="@+id/textTitle"
+            android:id="@+id/tvStop"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginLeft="20dp"
             android:layout_weight="1"
             android:gravity="center_vertical"
             android:text="Прекратить диалог"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:onClick="onClick"
             android:textColor="#26D3CE"
             android:textSize="16sp" />
     </LinearLayout>

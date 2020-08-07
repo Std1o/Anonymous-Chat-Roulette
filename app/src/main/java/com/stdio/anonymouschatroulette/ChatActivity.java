@@ -1,6 +1,7 @@
 package com.stdio.anonymouschatroulette;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -185,6 +186,9 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
             case R.id.ivBack:
                 finish();
                 break;
+            case R.id.tvStop:
+                stopMessaging();
+                break;
             case R.id.addMessageImageView:
                 Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -203,6 +207,25 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
                 }
                 break;
         }
+    }
+
+    private void stopMessaging() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                this);
+        alertDialogBuilder
+                .setMessage("Прекратить диалог?")
+                .setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        finish();
+                    }
+                })
+                .setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 
     @Override
