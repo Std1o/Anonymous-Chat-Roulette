@@ -145,20 +145,13 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
                         .placeholder(R.drawable.progress_animation)
                         .dontAnimate()
                         .dontTransform();
+                hideAllItemLayouts(viewHolder);
                 if (friendlyMessage.getText() != null) {
-                    System.out.println(friendlyMessage.getId());
-                    System.out.println(mFirebaseUser.getUid());
                     if (friendlyMessage.getUid().equals(mFirebaseUser.getUid())) {
-                        viewHolder.flImageLayoutLeft.setVisibility(ImageView.GONE);
-                        viewHolder.flImageLayout.setVisibility(ImageView.GONE);
                         viewHolder.flMessage.setVisibility(TextView.VISIBLE);
-                        viewHolder.flMessageLeft.setVisibility(TextView.GONE);
                         viewHolder.tvMessage.setText(friendlyMessage.getText());
                     }
                     else {
-                        viewHolder.flImageLayoutLeft.setVisibility(ImageView.GONE);
-                        viewHolder.flImageLayout.setVisibility(ImageView.GONE);
-                        viewHolder.flMessage.setVisibility(TextView.GONE);
                         viewHolder.flMessageLeft.setVisibility(TextView.VISIBLE);
                         viewHolder.tvMessageLeft.setText(friendlyMessage.getText());
                     }
@@ -169,10 +162,7 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
                                 .load((imageIsNotLoaded) ? R.drawable.progress_animation : friendlyMessage.getImageUrl())
                                 .apply(requestOptions)
                                 .into(viewHolder.messageImageView);
-                        viewHolder.flImageLayoutLeft.setVisibility(ImageView.GONE);
                         viewHolder.flImageLayout.setVisibility(ImageView.VISIBLE);
-                        viewHolder.flMessage.setVisibility(TextView.GONE);
-                        viewHolder.flMessageLeft.setVisibility(TextView.GONE);
                     }
                     else {
                         Glide.with(viewHolder.messageImageView.getContext())
@@ -180,9 +170,6 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
                                 .apply(requestOptions)
                                 .into(viewHolder.messageImageViewLeft);
                         viewHolder.flImageLayoutLeft.setVisibility(ImageView.VISIBLE);
-                        viewHolder.flImageLayout.setVisibility(ImageView.GONE);
-                        viewHolder.flMessage.setVisibility(TextView.GONE);
-                        viewHolder.flMessageLeft.setVisibility(TextView.GONE);
                     }
                 }
 
@@ -210,6 +197,13 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
                 return position;
             }
         };
+    }
+
+    private void hideAllItemLayouts(MessageViewHolder viewHolder) {
+        viewHolder.flImageLayoutLeft.setVisibility(ImageView.GONE);
+        viewHolder.flImageLayout.setVisibility(ImageView.GONE);
+        viewHolder.flMessage.setVisibility(TextView.GONE);
+        viewHolder.flMessageLeft.setVisibility(TextView.GONE);
     }
 
     public void onClick(View view) {
