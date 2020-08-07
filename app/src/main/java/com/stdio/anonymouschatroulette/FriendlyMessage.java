@@ -22,6 +22,7 @@ public class FriendlyMessage {
     private String name;
     private String photoUrl;
     private String imageUrl;
+    private String uid;
 
     public FriendlyMessage() {
     }
@@ -71,5 +72,13 @@ public class FriendlyMessage {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 }

@@ -55,6 +55,7 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
     private EditText mMessageEditText;
     private FirebaseUser mFirebaseUser;
     private DatabaseReference mFirebaseDatabaseReference;
+    private DatabaseReference inSearchingRef;
     private FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder> mFirebaseAdapter;
     ProgressDialog dialog;
 
@@ -67,7 +68,9 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
 
         auth();
         initRV();
-        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        mFirebaseDatabaseReference = database.getReference();
+        inSearchingRef = database.getReference("inSearching");
         SnapshotParser<FriendlyMessage> parser = new SnapshotParser<FriendlyMessage>() {
             @Override
             public FriendlyMessage parseSnapshot(DataSnapshot dataSnapshot) {

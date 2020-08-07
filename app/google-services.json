@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1023153877916-fik213iugr2ggli0jo2e4k000936q907.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.stdio.anonymouschatroulette",
+            "certificate_hash": "034ab3ec8da5db038db01c5dc242774bc73e710a"
+          }
+        },
+        {
           "client_id": "1023153877916-1ihm5h96ur49nb4slf8mvtaev6vhrnad.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
