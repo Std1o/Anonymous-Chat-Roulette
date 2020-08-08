@@ -79,8 +79,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             startActivityForResult(signInIntent, RC_SIGN_IN);
         }
         else {
-            inSearchingRef.child(fbKey).removeValue();
-            inSearchingRef.child(fbKey).setValue(mFirebaseUser.getUid());
             findInterlocutorContinueMessaging();
         }
     }
@@ -93,6 +91,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     startActivity(new Intent(MainActivity.this, ChatActivity.class));
                 }
                 else {
+                    inSearchingRef.child(fbKey).removeValue();
+                    inSearchingRef.child(fbKey).setValue(mFirebaseUser.getUid());
                     findInterlocutor();
                 }
             }
