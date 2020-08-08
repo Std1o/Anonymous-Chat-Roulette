@@ -37,14 +37,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     // Firebase instance variables
     private FirebaseAuth mFirebaseAuth;
     private DatabaseReference inSearchingRef;
+    private DatabaseReference userRef;
     private FirebaseUser mFirebaseUser;
     String fbKey = "tmp";
+    FirebaseDatabase database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        database = FirebaseDatabase.getInstance();
         inSearchingRef = database.getReference("inSearching");
         // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -59,6 +61,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         // Initialize FirebaseAuth
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
+        if (mFirebaseUser != null) {
+            userRef = database.getReference(mFirebaseUser.getUid());
+        }
         fbKey = inSearchingRef.push().getKey();
     }
 
@@ -132,6 +137,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                             Toast.makeText(MainActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         } else {
+                            mFirebaseUser = mFirebaseAuth.getCurrentUser();
+                            userRef = database.getReference(mFirebaseUser.getUid());
                             Log.d(TAG, "i am working");
                             startActivity(new Intent(MainActivity.this, ChatActivity.class));
                         }
@@ -147,6 +154,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 String uid = dataSnapshot.getValue(String.class);
                 if (!uid.equals(mFirebaseUser.getUid())) {
+                    userRef.child("interlocutor").push().setValue(uid);
                     startActivity(new Intent(MainActivity.this, ChatActivity.class));
                 }
             }

@@ -32,10 +32,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -54,10 +56,11 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
     private LinearLayoutManager mLinearLayoutManager;
     private EditText mMessageEditText;
     private FirebaseUser mFirebaseUser;
-    private DatabaseReference mFirebaseDatabaseReference;
-    private DatabaseReference inSearchingRef;
+    private DatabaseReference userRef;
+    private DatabaseReference interlocutorRef;
     private FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder> mFirebaseAdapter;
     ProgressDialog dialog;
+    FirebaseDatabase database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,45 +71,76 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
 
         auth();
         initRV();
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        mFirebaseDatabaseReference = database.getReference();
-        inSearchingRef = database.getReference("inSearching");
-        SnapshotParser<FriendlyMessage> parser = new SnapshotParser<FriendlyMessage>() {
+        database = FirebaseDatabase.getInstance();
+        userRef = database.getReference(mFirebaseUser.getUid());
+        findCompanion();
+        mMessageEditText = findViewById(R.id.messageEditText);
+    }
+
+    private void findCompanion() {
+
+        Query myQuery = userRef.child("interlocutor");
+        myQuery.addChildEventListener(new ChildEventListener() {
             @Override
-            public FriendlyMessage parseSnapshot(DataSnapshot dataSnapshot) {
-                FriendlyMessage friendlyMessage = dataSnapshot.getValue(FriendlyMessage.class);
-                if (friendlyMessage != null) {
-                    friendlyMessage.setId(dataSnapshot.getKey());
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                String uid = dataSnapshot.getValue(String.class);
+                if (!uid.equals(mFirebaseUser.getUid())) {
+                    interlocutorRef = database.getReference(uid);
+                    SnapshotParser<FriendlyMessage> parser = new SnapshotParser<FriendlyMessage>() {
+                        @Override
+                        public FriendlyMessage parseSnapshot(DataSnapshot dataSnapshot) {
+                            FriendlyMessage friendlyMessage = dataSnapshot.getValue(FriendlyMessage.class);
+                            if (friendlyMessage != null) {
+                                friendlyMessage.setId(dataSnapshot.getKey());
+                            }
+                            return friendlyMessage;
+                        }
+                    };
+
+                    DatabaseReference messagesRef = userRef.child(MESSAGES_CHILD);
+                    FirebaseRecyclerOptions<FriendlyMessage> options = new FirebaseRecyclerOptions.Builder<FriendlyMessage>()
+                            .setQuery(messagesRef, parser)
+                            .build();
+                    initFirebaseAdapter(options);
+
+                    mFirebaseAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+                        @Override
+                        public void onItemRangeInserted(int positionStart, int itemCount) {
+                            super.onItemRangeInserted(positionStart, itemCount);
+                            int friendlyMessageCount = mFirebaseAdapter.getItemCount();
+                            int lastVisiblePosition = mLinearLayoutManager.findLastCompletelyVisibleItemPosition();
+                            // If the recycler view is initially being loaded or the
+                            // user is at the bottom of the list, scroll to the bottom
+                            // of the list to show the newly added message.
+                            if (lastVisiblePosition == -1 ||
+                                    (positionStart >= (friendlyMessageCount - 1) &&
+                                            lastVisiblePosition == (positionStart - 1))) {
+                                mMessageRecyclerView.scrollToPosition(positionStart);
+                            }
+                        }
+                    });
+
+                    mMessageRecyclerView.setAdapter(mFirebaseAdapter);
+                    mFirebaseAdapter.startListening();
                 }
-                return friendlyMessage;
             }
-        };
 
-        DatabaseReference messagesRef = mFirebaseDatabaseReference.child(MESSAGES_CHILD);
-        FirebaseRecyclerOptions<FriendlyMessage> options = new FirebaseRecyclerOptions.Builder<FriendlyMessage>()
-                .setQuery(messagesRef, parser)
-                .build();
-        initFirebaseAdapter(options);
-
-        mFirebaseAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
-            public void onItemRangeInserted(int positionStart, int itemCount) {
-                super.onItemRangeInserted(positionStart, itemCount);
-                int friendlyMessageCount = mFirebaseAdapter.getItemCount();
-                int lastVisiblePosition = mLinearLayoutManager.findLastCompletelyVisibleItemPosition();
-                // If the recycler view is initially being loaded or the
-                // user is at the bottom of the list, scroll to the bottom
-                // of the list to show the newly added message.
-                if (lastVisiblePosition == -1 ||
-                        (positionStart >= (friendlyMessageCount - 1) &&
-                                lastVisiblePosition == (positionStart - 1))) {
-                    mMessageRecyclerView.scrollToPosition(positionStart);
-                }
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
             }
         });
-
-        mMessageRecyclerView.setAdapter(mFirebaseAdapter);
-        mMessageEditText = findViewById(R.id.messageEditText);
     }
 
     private void auth() {
@@ -172,18 +206,6 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
                         viewHolder.flImageLayoutLeft.setVisibility(ImageView.VISIBLE);
                     }
                 }
-
-
-                /*viewHolder.messengerTextView.setText(friendlyMessage.getName());
-                if (friendlyMessage.getPhotoUrl() == null) {
-                    viewHolder.messengerImageView.setImageDrawable(ContextCompat.getDrawable(MainActivity.this,
-                            R.drawable.ic_account_circle_black_36dp));
-                } else {
-                    Glide.with(MainActivity.this)
-                            .load(friendlyMessage.getPhotoUrl())
-                            .into(viewHolder.messengerImageView);
-                }*/
-
             }
 
             // override getItemId and getItemViewType to fix "RecyclerView items duplicate and constantly changing"
@@ -228,7 +250,8 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
                             mPhotoUrl,
                             null /* no image */);
                     friendlyMessage.setUid(mFirebaseUser.getUid());
-                    mFirebaseDatabaseReference.child(MESSAGES_CHILD).push().setValue(friendlyMessage);
+                    userRef.child(MESSAGES_CHILD).push().setValue(friendlyMessage);
+                    interlocutorRef.child(MESSAGES_CHILD).push().setValue(friendlyMessage);
                     mMessageEditText.setText("");
                 }
                 break;
@@ -263,7 +286,9 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
     @Override
     public void onResume() {
         super.onResume();
-        mFirebaseAdapter.startListening();
+        if (mFirebaseAdapter != null) {
+            mFirebaseAdapter.startListening();
+        }
     }
 
     @Override
@@ -287,7 +312,26 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
                 FriendlyMessage tempMessage = new FriendlyMessage(null, mUsername, mPhotoUrl,
                         LOADING_IMAGE_URL);
                 tempMessage.setUid(mFirebaseUser.getUid());
-                mFirebaseDatabaseReference.child(MESSAGES_CHILD).push()
+                userRef.child(MESSAGES_CHILD).push()
+                        .setValue(tempMessage, new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(DatabaseError databaseError,
+                                                   DatabaseReference databaseReference) {
+                                if (databaseError == null) {
+                                    String key = databaseReference.getKey();
+                                    StorageReference storageReference = FirebaseStorage.getInstance()
+                                            .getReference(mFirebaseUser.getUid())
+                                            .child(key)
+                                            .child(uri.getLastPathSegment());
+
+                                    putImageInStorage(storageReference, uri, key);
+                                } else {
+                                    Log.w(TAG, "Unable to write message to database.",
+                                            databaseError.toException());
+                                }
+                            }
+                        });
+                interlocutorRef.child(MESSAGES_CHILD).push()
                         .setValue(tempMessage, new DatabaseReference.CompletionListener() {
                             @Override
                             public void onComplete(DatabaseError databaseError,
@@ -316,7 +360,8 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
         dialog.setCancelable(false);
         dialog.setButton(Dialog.BUTTON_POSITIVE, "Отмена", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                mFirebaseDatabaseReference.child(MESSAGES_CHILD).child(key).removeValue();
+                userRef.child(MESSAGES_CHILD).child(key).removeValue();
+                interlocutorRef.child(MESSAGES_CHILD).child(key).removeValue();
                 uploadTask.cancel();
             }
         });
@@ -355,8 +400,8 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
                                                                 new FriendlyMessage(null, mUsername, mPhotoUrl,
                                                                         task.getResult().toString());
                                                         friendlyMessage.setUid(mFirebaseUser.getUid());
-                                                        mFirebaseDatabaseReference.child(MESSAGES_CHILD).child(key)
-                                                                .setValue(friendlyMessage);
+                                                        userRef.child(MESSAGES_CHILD).child(key).setValue(friendlyMessage);
+                                                        interlocutorRef.child(MESSAGES_CHILD).child(key).setValue(friendlyMessage);
                                                         dialog.cancel();
                                                     }
                                                 }
