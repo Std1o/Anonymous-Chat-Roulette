@@ -1,6 +1,7 @@
 package com.stdio.anonymouschatroulette;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -38,6 +39,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -122,6 +124,7 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
 
                     mMessageRecyclerView.setAdapter(mFirebaseAdapter);
                     mFirebaseAdapter.startListening();
+                    initStopDialogListener();
                 }
             }
 
@@ -139,6 +142,38 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+    }
+
+    private void initStopDialogListener() {
+        interlocutorRef.child("dialogIsStopped").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                if (snapshot.getValue(boolean.class)) {
+                    Toast.makeText(ChatActivity.this, "Диалог остановлен", Toast.LENGTH_SHORT).show();
+                    ChatActivity.this.finish();
+                }
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
     }
@@ -265,6 +300,9 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
                 .setMessage("Прекратить диалог?")
                 .setPositiveButton("Да", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        userRef.removeValue();
+                        interlocutorRef.child("dialogIsStopped").push().setValue(true);
+                        interlocutorRef.removeValue();
                         finish();
                     }
                 })
