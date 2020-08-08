@@ -29,6 +29,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener{
 
@@ -85,30 +86,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     }
 
     private void findInterlocutorContinueMessaging() {
-        userRef.child("interlocutor").addChildEventListener(new ChildEventListener() {
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                if (snapshot.exists()) {
+            public void onDataChange(DataSnapshot snapshot) {
+                if (snapshot.hasChild("interlocutor")) {
                     startActivity(new Intent(MainActivity.this, ChatActivity.class));
                 }
                 else {
                     findInterlocutor();
                 }
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
             }
 
             @Override
