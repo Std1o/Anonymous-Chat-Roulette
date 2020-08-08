@@ -1,6 +1,7 @@
 package com.stdio.anonymouschatroulette;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -79,8 +80,42 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         else {
             inSearchingRef.child(fbKey).removeValue();
             inSearchingRef.child(fbKey).setValue(mFirebaseUser.getUid());
-            findCompanion();
+            findInterlocutorContinueMessaging();
         }
+    }
+
+    private void findInterlocutorContinueMessaging() {
+        userRef.child("interlocutor").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                if (snapshot.exists()) {
+                    startActivity(new Intent(MainActivity.this, ChatActivity.class));
+                }
+                else {
+                    findInterlocutor();
+                }
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     @Override
@@ -146,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 });
     }
 
-    private void findCompanion() {
+    private void findInterlocutor() {
 
         Query myQuery = inSearchingRef;
         myQuery.addChildEventListener(new ChildEventListener() {
