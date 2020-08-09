@@ -125,7 +125,6 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
 
                     mMessageRecyclerView.setAdapter(mFirebaseAdapter);
                     mFirebaseAdapter.startListening();
-                    initStopDialogListener();
                 }
             }
 
@@ -146,37 +145,6 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-            }
-        });
-    }
-
-    private void initStopDialogListener() {
-        interlocutorRef.child("dialogIsStopped").addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                if (snapshot.getValue(boolean.class)) {
-                    //infoDialog("Диалог остановлен");
-                }
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
     }
