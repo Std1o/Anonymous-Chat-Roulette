@@ -97,11 +97,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     startActivity(new Intent(MainActivity.this, ChatActivity.class));
                 }
                 else {
-                    inSearching = true;
-                    inSearchingRef.child(fbKey).removeValue();
-                    inSearchingRef.child(fbKey).setValue(mFirebaseUser.getUid());
-                    findInterlocutor();
-                    showProgressDialog();
+                    startSearching();
                 }
             }
 
@@ -171,11 +167,18 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                         } else {
                             mFirebaseUser = mFirebaseAuth.getCurrentUser();
                             userRef = database.getReference(mFirebaseUser.getUid());
-                            Log.d(TAG, "i am working");
-                            startActivity(new Intent(MainActivity.this, ChatActivity.class));
+                            startSearching();
                         }
                     }
                 });
+    }
+
+    private void startSearching() {
+        inSearching = true;
+        inSearchingRef.child(fbKey).removeValue();
+        inSearchingRef.child(fbKey).setValue(mFirebaseUser.getUid());
+        findInterlocutor();
+        showProgressDialog();
     }
 
     private void showProgressDialog() {
