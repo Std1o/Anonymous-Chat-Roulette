@@ -179,6 +179,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private void showProgressDialog() {
         dialog = new ProgressDialog(this);
         dialog.setTitle("Поиск собеседника...");
+        dialog.setMessage("Пожалуйста, оставайтесь в приложении");
         dialog.setCancelable(false);
         dialog.setButton(Dialog.BUTTON_POSITIVE, "Отмена", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
