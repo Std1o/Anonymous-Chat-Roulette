@@ -114,7 +114,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     @Override
     public void onPause() {
-        dialog.cancel();
+        if (dialog != null) {
+            dialog.cancel();
+        }
         inSearchingRef.child(fbKey).removeValue();
         super.onPause();
     }
