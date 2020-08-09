@@ -28,11 +28,10 @@
 
         <TextView
             android:id="@+id/tvStop"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
+            android:layout_gravity="center_vertical"
             android:text="Прекратить диалог"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
