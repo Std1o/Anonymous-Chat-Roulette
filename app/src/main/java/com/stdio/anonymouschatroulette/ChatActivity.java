@@ -154,6 +154,7 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
                 this);
         alertDialogBuilder
                 .setMessage(s)
+                .setCancelable(false)
                 .setPositiveButton("Ок", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         finish();
@@ -346,7 +347,8 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
                 FriendlyMessage tempMessage = new FriendlyMessage(null, mUsername, mPhotoUrl,
                         LOADING_IMAGE_URL);
                 tempMessage.setUid(mFirebaseUser.getUid());
-                userRef.child(MESSAGES_CHILD).push()
+                String key = userRef.child(MESSAGES_CHILD).push().getKey();
+                userRef.child(MESSAGES_CHILD).child(key)
                         .setValue(tempMessage, new DatabaseReference.CompletionListener() {
                             @Override
                             public void onComplete(DatabaseError databaseError,
@@ -365,7 +367,7 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
                                 }
                             }
                         });
-                interlocutorRef.child(MESSAGES_CHILD).push()
+                userRef.child(MESSAGES_CHILD).child(key)
                         .setValue(tempMessage, new DatabaseReference.CompletionListener() {
                             @Override
                             public void onComplete(DatabaseError databaseError,
@@ -376,8 +378,6 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
                                             .getReference(mFirebaseUser.getUid())
                                             .child(key)
                                             .child(uri.getLastPathSegment());
-
-                                    putImageInStorage(storageReference, uri, key);
                                 } else {
                                     Log.w(TAG, "Unable to write message to database.",
                                             databaseError.toException());
