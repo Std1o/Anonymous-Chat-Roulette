@@ -149,7 +149,7 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
         });
     }
 
-    private void infoDialog(String s) {
+    private void infoDialog(String s) throws Exception{
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                 this);
         alertDialogBuilder
@@ -243,7 +243,11 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
             @Override
             public int getItemCount() {
                 if (dialogIsStopped) {
-                    infoDialog("Диалог остановлен");
+                    try {
+                        infoDialog("Диалог остановлен");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     dialogIsStopped = false;
                 }
                 return super.getItemCount();

@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                         } else {
                             mFirebaseUser = mFirebaseAuth.getCurrentUser();
                             userRef = database.getReference(mFirebaseUser.getUid());
-                            startSearching();
+                            findInterlocutorContinueMessaging();
                         }
                     }
                 });
