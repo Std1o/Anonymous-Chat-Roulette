@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private FirebaseUser mFirebaseUser;
     String fbKey = "tmp";
     FirebaseDatabase database;
+    boolean inSearching = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     startActivity(new Intent(MainActivity.this, ChatActivity.class));
                 }
                 else {
+                    inSearching = true;
                     inSearchingRef.child(fbKey).removeValue();
                     inSearchingRef.child(fbKey).setValue(mFirebaseUser.getUid());
                     findInterlocutor();
@@ -175,8 +177,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 String uid = dataSnapshot.getValue(String.class);
                 if (!uid.equals(mFirebaseUser.getUid())) {
-                    userRef.child("interlocutor").push().setValue(uid);
-                    startActivity(new Intent(MainActivity.this, ChatActivity.class));
+                    if (inSearching) {
+                        userRef.child("interlocutor").push().setValue(uid);
+                        startActivity(new Intent(MainActivity.this, ChatActivity.class));
+                    }
+                    inSearching = false;
                 }
             }
 

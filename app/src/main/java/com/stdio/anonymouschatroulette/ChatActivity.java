@@ -63,6 +63,7 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
     private FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder> mFirebaseAdapter;
     ProgressDialog dialog;
     FirebaseDatabase database;
+    boolean dialogIsStopped = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,6 +135,9 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
+                System.out.println("REMOOOOVED");
+                dialogIsStopped = true;
+                mFirebaseAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -151,8 +155,7 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 if (snapshot.getValue(boolean.class)) {
-                    Toast.makeText(ChatActivity.this, "Диалог остановлен", Toast.LENGTH_SHORT).show();
-                    ChatActivity.this.finish();
+                    //infoDialog("Диалог остановлен");
                 }
             }
 
@@ -176,6 +179,20 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
 
             }
         });
+    }
+
+    private void infoDialog(String s) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                this);
+        alertDialogBuilder
+                .setMessage(s)
+                .setPositiveButton("Ок", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        finish();
+                    }
+                });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 
     private void auth() {
@@ -210,6 +227,7 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
 
             @Override
             protected void onBindViewHolder(final MessageViewHolder viewHolder, int position, FriendlyMessage friendlyMessage) {
+                System.out.println("TTTTT");
                 final RequestOptions requestOptions = new RequestOptions()
                         .placeholder(R.drawable.progress_animation)
                         .dontAnimate()
@@ -252,6 +270,15 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
             @Override
             public int getItemViewType(int position) {
                 return position;
+            }
+
+            @Override
+            public int getItemCount() {
+                if (dialogIsStopped) {
+                    infoDialog("Диалог остановлен");
+                    dialogIsStopped = false;
+                }
+                return super.getItemCount();
             }
         };
     }
@@ -317,7 +344,9 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
 
     @Override
     public void onPause() {
-        mFirebaseAdapter.stopListening();
+        if (mFirebaseAdapter != null) {
+            mFirebaseAdapter.stopListening();
+        }
         super.onPause();
     }
 
