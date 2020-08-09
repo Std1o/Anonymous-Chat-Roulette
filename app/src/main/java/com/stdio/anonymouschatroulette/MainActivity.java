@@ -4,6 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -30,6 +33,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.UploadTask;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener{
 
@@ -44,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     String fbKey = "tmp";
     FirebaseDatabase database;
     boolean inSearching = false;
+    ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +101,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     inSearchingRef.child(fbKey).removeValue();
                     inSearchingRef.child(fbKey).setValue(mFirebaseUser.getUid());
                     findInterlocutor();
+                    showProgressDialog();
                 }
             }
 
@@ -108,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     @Override
     public void onPause() {
+        dialog.cancel();
         inSearchingRef.child(fbKey).removeValue();
         super.onPause();
     }
@@ -169,6 +176,18 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 });
     }
 
+    private void showProgressDialog() {
+        dialog = new ProgressDialog(this);
+        dialog.setTitle("Поиск собеседника...");
+        dialog.setCancelable(false);
+        dialog.setButton(Dialog.BUTTON_POSITIVE, "Отмена", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                inSearchingRef.child(fbKey).removeValue();
+            }
+        });
+        dialog.show();
+    }
+
     private void findInterlocutor() {
 
         Query myQuery = inSearchingRef;
@@ -179,6 +198,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 if (!uid.equals(mFirebaseUser.getUid())) {
                     if (inSearching) {
                         userRef.child("interlocutor").push().setValue(uid);
+                        dialog.cancel();
                         startActivity(new Intent(MainActivity.this, ChatActivity.class));
                     }
                     inSearching = false;

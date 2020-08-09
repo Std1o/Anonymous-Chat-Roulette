@@ -195,7 +195,6 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
 
             @Override
             protected void onBindViewHolder(final MessageViewHolder viewHolder, int position, FriendlyMessage friendlyMessage) {
-                System.out.println("TTTTT");
                 final RequestOptions requestOptions = new RequestOptions()
                         .placeholder(R.drawable.progress_animation)
                         .dontAnimate()
