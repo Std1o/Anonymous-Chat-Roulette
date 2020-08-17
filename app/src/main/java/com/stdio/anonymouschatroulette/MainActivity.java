@@ -204,6 +204,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 if (!uid.equals(mFirebaseUser.getUid())) {
                     if (inSearching) {
                         userRef.child("interlocutor").push().setValue(uid);
+                        createDialogWithAFKUser(uid, dataSnapshot.getKey());
                         dialog.cancel();
                         startActivity(new Intent(MainActivity.this, ChatActivity.class));
                     }
@@ -225,6 +226,24 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+    }
+
+    private void createDialogWithAFKUser(String uid, final String interlocutorSearchingKey) {
+        final DatabaseReference interlocutorRef = database.getReference(uid);
+        interlocutorRef.child("interlocutor").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
+                    interlocutorRef.child("interlocutor").push().setValue(mFirebaseUser.getUid());
+                    inSearchingRef.child(interlocutorSearchingKey).removeValue();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
     }
