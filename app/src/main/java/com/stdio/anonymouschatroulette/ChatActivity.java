@@ -27,6 +27,11 @@ import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.firebase.ui.database.SnapshotParser;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -64,11 +69,21 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
     ProgressDialog dialog;
     FirebaseDatabase database;
     boolean dialogIsStopped = false;
+    InterstitialAd mInterstitialAd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-9390944171328953/6799366627");
+        mInterstitialAd.loadAd(new AdRequest.Builder().build());
         // Set default username is anonymous.
         mUsername = ANONYMOUS;
 
@@ -265,6 +280,7 @@ public class ChatActivity extends AppCompatActivity implements GoogleApiClient.O
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.ivBack:
+                mInterstitialAd.show();
                 finish();
                 break;
             case R.id.tvStop:
